@@ -39,7 +39,7 @@
         <input type="text" placeholder="Nama Barang" id="nama" class="p-2 border rounded" required>
         <input type="number" placeholder="Jumlah Barang" id="jumlah" class="p-2 border rounded" required>
         <input type="number" placeholder="Harga Satuan" id="harga" class="p-2 border rounded" required>
-        <input type="text" placeholder="Total Harga" id="total" class="p-2 border rounded bg-gray-100" disabled>
+        <input type="text" placeholder="Total Harga" id="total" class="p-2 border rounded bg-gray-100" readonly>
         <input type="text" placeholder="Asal Dana" id="dana" class="p-2 border rounded">
         <input type="number" placeholder="Tahun Pembuatan" id="tahun" class="p-2 border rounded">
         <input type="text" placeholder="Kelengkapan Dokumen" id="dokumen" class="p-2 border rounded">
@@ -47,6 +47,7 @@
         <input type="text" placeholder="Pengguna Barang" id="pengguna" class="p-2 border rounded">
         <input type="text" placeholder="Keterangan" id="keterangan" class="p-2 border rounded">
         <input type="file" id="foto" accept="image/*" class="p-2 border rounded" required>
+     
       </form>
       <button onclick="simpanData()" class="mt-4 bg-green-500 text-white px-4 py-2 rounded">Simpan</button>
 
@@ -140,6 +141,13 @@
         .then(data => {
           allData = data;
           renderTable(data);
+          .then(res => res.json())
+        .then(res => {
+          console.log(res); // Tambahkan ini
+          alert('Data berhasil disimpan');
+          ...
+          })
+
         });
     }
 

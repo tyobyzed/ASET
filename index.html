@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventaris Aset Sekolah</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-image: url('https://example.com/background.jpg');
+      background-size: cover;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+  <div id="app" class="w-full max-w-4xl bg-white bg-opacity-90 p-6 rounded-lg shadow-lg">
+    <div id="loginSection" class="mb-6">
+      <h1 class="text-2xl font-bold mb-4 text-center">Login Pengguna</h1>
+      <input type="text" id="username" placeholder="Username" class="w-full mb-2 p-2 border rounded" />
+      <input type="password" id="password" placeholder="Password" class="w-full mb-4 p-2 border rounded" />
+      <button onclick="login()" class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded w-full">Login</button>
+    </div>
+
+    <div id="mainSection" style="display:none">
+      <h2 class="text-xl font-bold mb-4">Form Input Aset Sekolah</h2>
+      <form id="assetForm" class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <input type="text" placeholder="Nama Barang" id="nama" class="p-2 border rounded" required>
+        <input type="text" placeholder="Jenis Barang" id="jenis" class="p-2 border rounded" required>
+        <input type="number" placeholder="Jumlah" id="jumlah" class="p-2 border rounded" required>
+        <input type="number" placeholder="Harga Satuan" id="harga" class="p-2 border rounded" required>
+        <input type="text" placeholder="Asal Dana" id="dana" class="p-2 border rounded" required>
+        <input type="number" placeholder="Tahun Pembelian" id="tahun" class="p-2 border rounded" required>
+        <input type="text" placeholder="Penggunaan Barang" id="penggunaan" class="p-2 border rounded">
+        <input type="date" id="tanggal" class="p-2 border rounded" required>
+        <input type="file" id="foto" accept="image/*" class="p-2 border rounded" required>
+      </form>
+      <button onclick="simpanData()" class="mt-4 bg-green-500 text-white px-4 py-2 rounded">Simpan</button>
+
+      <h3 class="text-lg font-semibold mt-6">Filter Rekap</h3>
+      <div class="flex gap-2 mb-2">
+        <input type="number" placeholder="Tahun" id="filterTahun" class="p-2 border rounded">
+        <input type="month" id="filterBulan" class="p-2 border rounded">
+        <button onclick="filterData()" class="bg-blue-600 text-white px-3 py-1 rounded">Terapkan Filter</button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white text-sm" id="tabelData">
+          <thead class="bg-gray-200 text-left">
+            <tr>
+              <th class="px-2 py-1">Tanggal</th>
+              <th class="px-2 py-1">Nama</th>
+              <th class="px-2 py-1">Jenis</th>
+              <th class="px-2 py-1">Jumlah</th>
+              <th class="px-2 py-1">Harga Satuan</th>
+              <th class="px-2 py-1">Total</th>
+              <th class="px-2 py-1">Dana</th>
+              <th class="px-2 py-1">Tahun</th>
+              <th class="px-2 py-1">Penggunaan</th>
+              <th class="px-2 py-1">Foto</th>
+            </tr>
+          </thead>
+          <tbody id="dataBody"></tbody>
+        </table>
+      </div>
+      <button onclick="window.print()" class="mt-4 bg-yellow-500 text-white px-4 py-2 rounded">Cetak Data</button>
+    </div>
+  </div>
+
+  <script>
+    let dataInventaris = [];
+
+    function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      if(username === 'admin' && password === 'admin123') {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('mainSection').style.display = 'block';
+      } else {
+        alert('Username atau password salah!');
+      }
+    }
+
+    function simpanData() {
+      const nama = document.getElementById('nama').value;
+      const jenis = document.getElementById('jenis').value;
+      const jumlah = parseInt(document.getElementById('jumlah').value);
+      const harga = parseInt(document.getElementById('harga').value);
+      const dana = document.getElementById('dana').value;
+      const tahun = document.getElementById('tahun').value;
+      const penggunaan = document.getElementById('penggunaan').value;
+      const tanggal = document.getElementById('tanggal').value;
+      const foto = document.getElementById('foto').files[0];
+
+      if (!foto) return alert('Mohon unggah foto barang!');
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imgSrc = e.target.result;
+        const total = jumlah * harga;
+
+        const item = { tanggal, nama, jenis, jumlah, harga, total, dana, tahun, penggunaan, foto: imgSrc };
+        dataInventaris.push(item);
+        renderTable(dataInventaris);
+        document.getElementById('assetForm').reset();
+      };
+      reader.readAsDataURL(foto);
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('dataBody');
+      tbody.innerHTML = '';
+      data.forEach(item => {
+        const row = `<tr>
+          <td class="border px-2 py-1">${item.tanggal}</td>
+          <td class="border px-2 py-1">${item.nama}</td>
+          <td class="border px-2 py-1">${item.jenis}</td>
+          <td class="border px-2 py-1">${item.jumlah}</td>
+          <td class="border px-2 py-1">Rp${item.harga.toLocaleString()}</td>
+          <td class="border px-2 py-1">Rp${item.total.toLocaleString()}</td>
+          <td class="border px-2 py-1">${item.dana}</td>
+          <td class="border px-2 py-1">${item.tahun}</td>
+          <td class="border px-2 py-1">${item.penggunaan}</td>
+          <td class="border px-2 py-1"><img src="${item.foto}" class="w-16 h-16 object-cover" /></td>
+        </tr>`;
+        tbody.innerHTML += row;
+      });
+    }
+
+    function filterData() {
+      const tahun = document.getElementById('filterTahun').value;
+      const bulan = document.getElementById('filterBulan').value;
+      const hasil = dataInventaris.filter(item => {
+        const tanggal = new Date(item.tanggal);
+        const bulanMatch = bulan ? item.tanggal.startsWith(bulan) : true;
+        const tahunMatch = tahun ? tanggal.getFullYear().toString() === tahun : true;
+        return bulanMatch && tahunMatch;
+      });
+      renderTable(hasil);
+    }
+  </script>
+</body>
+</html>

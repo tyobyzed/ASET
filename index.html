@@ -63,7 +63,9 @@
           <tbody id="dataBody"></tbody>
         </table>
       </div>
-      <button onclick="window.print()" class="mt-4 bg-yellow-500 text-white px-4 py-2 rounded">Cetak Data</button>
+      
+<button onclick="downloadPDF()" class="mt-2 bg-red-500 text-white px-4 py-2 rounded">Unduh PDF</button>
+
     </div>
   </div>
 
@@ -139,5 +141,23 @@
       renderTable(hasil);
     }
   </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script>
+  function downloadPDF() {
+    const table = document.getElementById('tabelData');
+    html2canvas(table).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jspdf.jsPDF('l', 'mm', 'a4');
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth - 20, pdfHeight);
+      pdf.save("rekap_inventaris.pdf");
+    });
+  }
+</script>
 </body>
+
 </html>

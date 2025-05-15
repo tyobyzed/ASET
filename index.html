@@ -38,13 +38,11 @@
         <input type="date" placeholder="Tanggal Pembukuan" id="tanggal" class="p-2 border rounded" required>
         <input type="text" placeholder="Kode Barang" id="kode" class="p-2 border rounded" required>
         <input type="text" placeholder="Nama Barang" id="nama" class="p-2 border rounded" required>
-        <input type="text" placeholder="Keterangan Barang" id="keteranganBarang" class="p-2 border rounded">
         <input type="number" placeholder="Jumlah Barang" id="jumlah" class="p-2 border rounded" required>
         <input type="number" placeholder="Harga Satuan" id="harga" class="p-2 border rounded" required>
         <input type="text" placeholder="Total Harga" id="total" class="p-2 border rounded bg-gray-100" disabled>
         <input type="text" placeholder="Asal Dana" id="dana" class="p-2 border rounded">
         <input type="number" placeholder="Tahun Pembuatan" id="tahun" class="p-2 border rounded">
-        <input type="text" placeholder="Asal Barang" id="asal" class="p-2 border rounded">
         <input type="text" placeholder="Kelengkapan Dokumen" id="dokumen" class="p-2 border rounded">
         <input type="text" placeholder="Keadaan Barang" id="keadaan" class="p-2 border rounded">
         <input type="text" placeholder="Pengguna Barang" id="pengguna" class="p-2 border rounded">
@@ -68,13 +66,11 @@
               <th class="px-2 py-1">Tanggal</th>
               <th class="px-2 py-1">Kode</th>
               <th class="px-2 py-1">Nama</th>
-              <th class="px-2 py-1">Keterangan</th>
               <th class="px-2 py-1">Jumlah</th>
               <th class="px-2 py-1">Harga</th>
               <th class="px-2 py-1">Total</th>
               <th class="px-2 py-1">Dana</th>
               <th class="px-2 py-1">Tahun</th>
-              <th class="px-2 py-1">Asal</th>
               <th class="px-2 py-1">Dokumen</th>
               <th class="px-2 py-1">Keadaan</th>
               <th class="px-2 py-1">Pengguna</th>
@@ -119,9 +115,7 @@
     reader.onload = function (e) {
       const item = {
         urut: get('urut'), tanggal: get('tanggal'), kode: get('kode'), nama: get('nama'),
-        keteranganBarang: get('keteranganBarang'), jumlah, harga, total,
-        dana: get('dana'), tahun: get('tahun'), asal: get('asal'),
-        dokumen: get('dokumen'), keadaan: get('keadaan'), pengguna: get('pengguna'),
+        jumlah, harga, total, dana: get('dana'), tahun: get('tahun'), dokumen: get('dokumen'), keadaan: get('keadaan'), pengguna: get('pengguna'),
         keterangan: get('keterangan'), foto: e.target.result
       };
       dataInventaris.push(item);
@@ -142,13 +136,11 @@
           <td class="border px-2 py-1">${item.tanggal}</td>
           <td class="border px-2 py-1">${item.kode}</td>
           <td class="border px-2 py-1">${item.nama}</td>
-          <td class="border px-2 py-1">${item.keteranganBarang}</td>
           <td class="border px-2 py-1">${item.jumlah}</td>
           <td class="border px-2 py-1">Rp${item.harga.toLocaleString()}</td>
           <td class="border px-2 py-1">Rp${item.total.toLocaleString()}</td>
           <td class="border px-2 py-1">${item.dana}</td>
           <td class="border px-2 py-1">${item.tahun}</td>
-          <td class="border px-2 py-1">${item.asal}</td>
           <td class="border px-2 py-1">${item.dokumen}</td>
           <td class="border px-2 py-1">${item.keadaan}</td>
           <td class="border px-2 py-1">${item.pengguna}</td>

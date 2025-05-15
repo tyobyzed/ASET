@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -15,11 +14,11 @@
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center">
-  <div id="app" class="w-full max-w-5xl bg-white bg-opacity-90 p-6 rounded-xl shadow-2xl backdrop-blur-md">
+  <div id="app" class="w-full max-w-6xl bg-white bg-opacity-90 p-6 rounded-xl shadow-2xl backdrop-blur-md">
     <div class="text-center mb-6">
       <img src="logo-sekolah.png" alt="Logo Sekolah" class="mx-auto w-24 h-24 mb-2">
       <h1 class="text-3xl font-bold text-blue-700">Aplikasi Inventaris Barang</h1>
-      <p class="text-2xl font-bold text-BLUE-700">SMA NEGERI 20 MEDAN</p>
+      <p class="text-2xl font-bold text-blue-700">SMA NEGERI 20 MEDAN</p>
     </div>
 
     <!-- Login Section -->
@@ -30,7 +29,7 @@
       <button onclick="login()" class="bg-blue-600 hover:bg-blue-800 text-white py-2 px-4 rounded w-full">Login</button>
     </div>
 
-     <!-- Main Section -->
+    <!-- Main Section -->
     <div id="mainSection" style="display:none">
       <h2 class="text-xl font-bold mb-4">Form Input Aset Sekolah</h2>
       <form id="assetForm" class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -86,103 +85,123 @@
     </div>
   </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-<script>
-  let dataInventaris = [];
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script>
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbysvQzEDAwlPpeCUXJZUcEwJEIz0vp3a6ZC08xIjEdIdLYC91L5cRDbqEdfAgdLg4tz/exec";
 
-  function login() {
-    const u = document.getElementById('username').value;
-    const p = document.getElementById('password').value;
-    if (u === 'admin' && p === 'admin123') {
-      document.getElementById('loginSection').style.display = 'none';
-      document.getElementById('mainSection').style.display = 'block';
-    } else {
-      alert('Username atau password salah!');
+    function login() {
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
+      if (u === 'admin' && p === 'admin123') {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('mainSection').style.display = 'block';
+        ambilData(); // load data dari Sheet setelah login
+      } else {
+        alert('Username atau password salah!');
+      }
     }
-  }
 
-  function simpanData() {
-    const get = id => document.getElementById(id).value;
-    const jumlah = parseInt(get('jumlah')) || 0;
-    const harga = parseInt(get('harga')) || 0;
-    const total = jumlah * harga;
-    const fotoFile = document.getElementById('foto').files[0];
+    function simpanData() {
+      const get = id => document.getElementById(id).value;
+      const jumlah = parseInt(get('jumlah')) || 0;
+      const harga = parseInt(get('harga')) || 0;
+      const total = jumlah * harga;
+      const fotoFile = document.getElementById('foto').files[0];
 
-    if (!fotoFile) return alert('Unggah foto!');
+      if (!fotoFile) return alert('Unggah foto!');
 
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const item = {
-        urut: get('urut'), tanggal: get('tanggal'), kode: get('kode'), nama: get('nama'),
-        jumlah, harga, total, dana: get('dana'), tahun: get('tahun'), dokumen: get('dokumen'), keadaan: get('keadaan'), pengguna: get('pengguna'),
-        keterangan: get('keterangan'), foto: e.target.result
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const data = {
+          urut: get('urut'), tanggal: get('tanggal'), kode: get('kode'), nama: get('nama'),
+          jumlah, harga, total, dana: get('dana'), tahun: get('tahun'), dokumen: get('dokumen'),
+          keadaan: get('keadaan'), pengguna: get('pengguna'), keterangan: get('keterangan'),
+          foto: e.target.result
+        };
+        fetch(webAppUrl, {
+          method: 'POST',
+          body: JSON.stringify(data),
+          headers: { 'Content-Type': 'application/json' }
+        }).then(res => res.json())
+          .then(res => {
+            alert('Data berhasil disimpan');
+            document.getElementById('assetForm').reset();
+            document.getElementById('total').value = '';
+            ambilData();
+          });
       };
-      dataInventaris.push(item);
-      renderTable(dataInventaris);
-      document.getElementById('assetForm').reset();
-      document.getElementById('total').value = '';
-    };
-    reader.readAsDataURL(fotoFile);
-  }
+      reader.readAsDataURL(fotoFile);
+    }
 
-  function renderTable(data) {
-    const tbody = document.getElementById('dataBody');
-    tbody.innerHTML = '';
-    data.forEach((item, i) => {
-      tbody.innerHTML += `
-        <tr>
-          <td class="border px-2 py-1">${item.urut}</td>
-          <td class="border px-2 py-1">${item.tanggal}</td>
-          <td class="border px-2 py-1">${item.kode}</td>
-          <td class="border px-2 py-1">${item.nama}</td>
-          <td class="border px-2 py-1">${item.jumlah}</td>
-          <td class="border px-2 py-1">Rp${item.harga.toLocaleString()}</td>
-          <td class="border px-2 py-1">Rp${item.total.toLocaleString()}</td>
-          <td class="border px-2 py-1">${item.dana}</td>
-          <td class="border px-2 py-1">${item.tahun}</td>
-          <td class="border px-2 py-1">${item.dokumen}</td>
-          <td class="border px-2 py-1">${item.keadaan}</td>
-          <td class="border px-2 py-1">${item.pengguna}</td>
-          <td class="border px-2 py-1">${item.keterangan}</td>
-          <td class="border px-2 py-1"><img src="${item.foto}" class="w-16 h-16 object-cover"/></td>
-        </tr>`;
-    });
-  }
+    function ambilData() {
+      fetch(webAppUrl)
+        .then(res => res.json())
+        .then(data => {
+          allData = data;
+          renderTable(data);
+        });
+    }
 
-  function filterData() {
-    const tahun = document.getElementById('filterTahun').value;
-    const bulan = document.getElementById('filterBulan').value;
-    const hasil = dataInventaris.filter(item => {
-      const tanggal = new Date(item.tanggal);
-      const bulanMatch = bulan ? item.tanggal.startsWith(bulan) : true;
-      const tahunMatch = tahun ? tanggal.getFullYear().toString() === tahun : true;
-      return bulanMatch && tahunMatch;
-    });
-    renderTable(hasil);
-  }
+    function renderTable(data) {
+      const tbody = document.getElementById('dataBody');
+      tbody.innerHTML = '';
+      data.forEach((item, i) => {
+        tbody.innerHTML += `
+          <tr>
+            <td class="border px-2 py-1">${item.urut}</td>
+            <td class="border px-2 py-1">${item.tanggal}</td>
+            <td class="border px-2 py-1">${item.kode}</td>
+            <td class="border px-2 py-1">${item.nama}</td>
+            <td class="border px-2 py-1">${item.jumlah}</td>
+            <td class="border px-2 py-1">Rp${parseInt(item.harga).toLocaleString()}</td>
+            <td class="border px-2 py-1">Rp${parseInt(item.total).toLocaleString()}</td>
+            <td class="border px-2 py-1">${item.dana}</td>
+            <td class="border px-2 py-1">${item.tahun}</td>
+            <td class="border px-2 py-1">${item.dokumen}</td>
+            <td class="border px-2 py-1">${item.keadaan}</td>
+            <td class="border px-2 py-1">${item.pengguna}</td>
+            <td class="border px-2 py-1">${item.keterangan}</td>
+            <td class="border px-2 py-1"><img src="${item.foto}" class="w-16 h-16 object-cover"/></td>
+          </tr>`;
+      });
+    }
 
-  function downloadPDF() {
-    const table = document.getElementById('tabelData');
-    html2canvas(table).then(canvas => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jspdf.jsPDF('l', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth - 20, pdfHeight);
-      pdf.save("rekap_inventaris.pdf");
-    });
-  }
+    function filterData() {
+      const tahun = document.getElementById('filterTahun').value;
+      const bulan = document.getElementById('filterBulan').value;
+      const hasil = allData.filter(item => {
+        const tanggal = new Date(item.tanggal);
+        const bulanMatch = bulan ? item.tanggal.startsWith(bulan) : true;
+        const tahunMatch = tahun ? tanggal.getFullYear().toString() === tahun : true;
+        return bulanMatch && tahunMatch;
+      });
+      renderTable(hasil);
+    }
 
-  document.getElementById('jumlah').addEventListener('input', hitungTotal);
-  document.getElementById('harga').addEventListener('input', hitungTotal);
+    function downloadPDF() {
+      const table = document.getElementById('tabelData');
+      html2canvas(table).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jspdf.jsPDF('l', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth - 20, pdfHeight);
+        pdf.save("rekap_inventaris.pdf");
+      });
+    }
 
-  function hitungTotal() {
-    const jumlah = parseInt(document.getElementById('jumlah').value) || 0;
-    const harga = parseInt(document.getElementById('harga').value) || 0;
-    const total = jumlah * harga;
-    document.getElementById('total').value = total.toLocaleString();
-  }
-</script>
+    document.getElementById('jumlah').addEventListener('input', hitungTotal);
+    document.getElementById('harga').addEventListener('input', hitungTotal);
+
+    function hitungTotal() {
+      const jumlah = parseInt(document.getElementById('jumlah').value) || 0;
+      const harga = parseInt(document.getElementById('harga').value) || 0;
+      const total = jumlah * harga;
+      document.getElementById('total').value = total.toLocaleString();
+    }
+
+    let allData = [];
+  </script>
 </body>
 </html>
